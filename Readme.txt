@@ -2,8 +2,6 @@
 
 InBlock 
 
-NB: Deployment gas cost:
-
 To properly run the software:
 
 In a cmd:
