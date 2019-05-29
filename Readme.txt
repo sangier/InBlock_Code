@@ -1,4 +1,4 @@
-******************************************************* Stefano Angieri : Universidad Carlos III Madrid ***************************************************************************************************
+*********************************** Stefano Angieri @ Universidad Carlos III Madrid ***********************************
 
 InBlock IPv4 
 
@@ -36,13 +36,13 @@ To insert a Certificate
 
 To read Certificates informations
 
-To read Certificates Owners associated to a prefix: 
+To read Certificates Owners associated to a prefix //NB. start-stop <2500  due to gas limit reason 
 4.1: Run x.readCertificateOwners(ip,start,stop)
 
-To read Certificates IDs associated to an Owner
+To read Certificates IDs associated to an Owner //NB. start-stop <2500  due to gas limit reason
 4.2: Run x.readCertificateIDsByOwner(ip,address,start,stop)
 
-To Read Certificates IDs	
+To Read Certificates IDs	// NB. start-stop <5000  due to gas limit reason
 4.3: Run x.readCertificateIDs(bytes4 ip, uint start, uint stop)
 
 Once we get the ID of a certificate

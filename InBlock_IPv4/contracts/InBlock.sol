@@ -13,7 +13,7 @@ contract InBlock is InBlock_F, usingOraclize{
 constructor() public{
 	owner=msg.sender;  
 	stopped=true; 
-	askOracleCost=437440800000000000;
+	askOracleCost=12000000000000000;
 	OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475); //Testrpc
 	//OAR = OraclizeAddrResolverI(0xc03A2615D5efaf5F49F60B7BB6583eaec212fdf1); //Ropsten
 	//OAR = OraclizeAddrResolverI(0x1d3B2638a7cC9f2CB3D298A3DA7a90B67E5506ed);	//mainnnet
