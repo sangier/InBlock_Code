@@ -1,6 +1,6 @@
 ******************************************************* Stefano Angieri : Universidad Carlos III Madrid ***************************************************************************************************
 
-InBlock 
+InBlock IPv6
 
 To properly run the software:
 
@@ -12,7 +12,7 @@ In another cmd:
 1.3:  Run: node bridge -H localhost:8545 -a 1
 
 In another cmd: 
-1.4:  Move into  "InBlock_v1\contracts" folder 
+1.4:  Move into  "InBlock\contracts" folder 
 1.5:  Run: truffle compile
 1.6:  Run: truffle migrate 
 1.7:  Run: truffle console
@@ -24,13 +24,12 @@ In another cmd:
 You can now start to play with the contract 
 
 To initialize the contract Run: 
-2.1:  Run: x.activateInBlock("base complete prefix expressed in HEX",number of base_mask_bits,number of allocabale_mask_bits,price) //where price has to be expressed as follow: 1800.00 --> 180000 example: x.activateInBlock("0x2001d000000000000000000000000000",20,32,300000)",20,32,180000)
-
+2.1:  Run: x.activateInBlock("base complete prefix expressed in HEX",number of base_mask_bits,number of allocabale_mask_bits,price) //where price has to be expressed as follow: 1800.00 --> 180000 example: x.activateInBlock("0x2001d000000000000000000000000000",20,32,300000)
 To perform and verify a sparse_allocation: 
 3.1:  Run: x.askOracleCost() //then copy the result
 3.2:  Run: x.getOracleCurrencyConversion({value: the copied value})
-3.3:  Run: x.getPrefixPrice() 
-3.4:  Run: x.prefixPrice() //then copy the result 
+3.3:  Run: x.getPrefixCost() 
+3.4:  Run: x.prefix //then copy the result 
 
 3.5:  Run: x.prefixRequest({from: wirte the address who will own the prefix, value: paste the result previously copied})
 3.6:  Run: x.getIDsBlocks_address(address a,int start, int stop)  //It give us the IDs of the blocks owned by the user having the specific address // NB. New start and stop paradigm to overcome computational limitation. Instead of asking for a search on the whole database we have to split the search in chunks. 
@@ -42,8 +41,8 @@ To perform and verify a sparse_allocation:
 To perform and verify a sequent_allocation:
 4.1:  Run: x.askOracleCost() //then copy the result
 4.2:  Run: x.getOracleCurrencyConversion({value: the copied value})
-4.3:  Run: x.getPrefixPrice() 
-4.4:  Run: x.prefixPrice() //then copy the result 
+4.3:  Run: x.getPrefixCost() 
+4.4:  Run: x.prefix() //then copy the result 
 
 4.5:  Run: x.sequentialAllocationPrefixRequest("ip_address of already owned prefix",{from: wirte the address who will own the prefix, value: paste the result previously copied})  
 4.6:  Run: x.getIDsBlocks_address(address a,int start, int stop)  //NB. New start and stop paradigm to overcome computational limitation. Instead of asking for a search on the whole database we have to split the search in chunks. 

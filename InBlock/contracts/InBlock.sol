@@ -16,11 +16,11 @@ constructor() public{
 	seed=0;
 	ID=0;
 	stopped=true; 
-	askOracleCost=43744080000000000;
+	askOracleCost=12000000000000000;
 	//OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475); //Testrpc
 	//OAR = OraclizeAddrResolverI(0xc03A2615D5efaf5F49F60B7BB6583eaec212fdf1); //Ropsten
 	OAR = OraclizeAddrResolverI(0x1d3B2638a7cC9f2CB3D298A3DA7a90B67E5506ed);	//mainnnet
-	prefixPrice=100000000000000000000; //SECURITY UTILITY. EVERYONE HAS TO ASK FOR THE RIGHT PRICE FIRST. 
+	prefixPrice=10000000000000000000000; //SECURITY UTILITY. EVERYONE HAS TO ASK FOR THE RIGHT PRICE FIRST. 
   }
 
 
@@ -49,7 +49,7 @@ bytes32 queryID3;
 event Log(string text);
 
 function getOracleCurrencyConversion() public payable{
-	 require(msg.value==askPriceCost, "Price Error");
+	 //require(msg.value==askOracleCost, "Price Error");
 	 queryID1=oraclize_query("URL","json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD");
 	 queryID2=oraclize_query("URL", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0");
 	 queryID3=oraclize_query("URL", "json(https://api.coinmarketcap.com/v1/ticker/ethereum/).0.price_usd");

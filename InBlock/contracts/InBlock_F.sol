@@ -56,17 +56,6 @@ function getIDsBlocksAddress(address a,int start, int stop)view public returns(u
 }
 
 
-function countBlock(int start, int stop)view internal returns(uint){
-uint count=0;
-for(int i=start; i<stop+1; i++){
-		if(!PrefCmpZ(blocks[i].ip_address) && !isAllocatedPrefixExpired(i)){
-		count=count+1;
-		}
-		}
-	return count;
-
-}
-
 
 //******************************************************* FIXED SIZE BLOCK REQUEST FUNCTIONS *******************************************************
 
