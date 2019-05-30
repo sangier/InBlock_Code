@@ -69,15 +69,20 @@ struct Info{
 	bytes hash;
 }
 
+
 struct Certificate{
 	bytes4 ip_address;
 	address o_addr;
-	uint id; 
+	uint id;
+	bytes publicKeyRir;
 	uint8 mask;
 	uint date;
+	uint validityT;
 	Info info;
 	bytes Roa;
 }
+
+
 
 //Necessary to performs division with float	
 function divide(uint numerator, uint denominator, uint precision) internal pure returns(uint quotient) {

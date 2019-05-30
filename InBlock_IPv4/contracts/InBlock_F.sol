@@ -5,7 +5,7 @@ import "./InBlock_Data.sol";
 contract InBlock_F is InBlock_Data{
 
 
-function insertCertificate(bytes4 ip, bytes uri_, bytes hashFunction_, bytes hash_, bytes ROAs_)payable public{
+function insertCertificate(bytes4 ip, bytes key, bytes uri_, bytes hashFunction_, bytes hash_, bytes ROAs_)payable public{
 
 require((price - 32270100000000000)<=msg.value|| msg.value<=(price + 32270100000000000) , "Price error");
 
@@ -13,8 +13,10 @@ Certificate memory currentCertificate;
 
 currentCertificate.o_addr=msg.sender;
 currentCertificate.id=ID_Index;
+currentCertificate.publicKeyRir=key;
 currentCertificate.mask=base_certificate_mask;
 currentCertificate.date=now;
+currentCertificate.validityT=now+365* 1 days;
 currentCertificate.Roa=ROAs_;
 currentCertificate.info.uri=uri_;
 currentCertificate.info.hashFunction=hashFunction_;
@@ -132,20 +134,57 @@ function countCertificatesIP(bytes4 ip)public view returns(uint){
 
 
 
-function getCertificates(bytes4 ip, uint id)public view returns(uint, address, bytes, bytes, bytes, bytes){
+function renewCertificate(bytes4 ip, uint id)payable public returns (uint){
 	
-	return(certificates[ip][id].date,certificates[ip][id].o_addr,certificates[ip][id].info.uri,certificates[ip][id].info.hashFunction,certificates[ip][id].info.hash,certificates[ip][id].Roa);
+	require(certificates[ip][id].o_addr==msg.sender);
+	require((price - 32270100000000000)<=msg.value|| msg.value<=(price + 32270100000000000) , "Price error");
+	uint app1= (certificates[ip][id].validityT+365* 1 days)-now;
+	certificates[ip][id].validityT=now+app1;	
+}
+
+function isValid(bytes4 ip,uint id)internal view returns (bool){
+
+if(certificates[ip][id].validityT>now)return true;
+else return false; 
+
+
+}
+
+function getCertificate(bytes4 ip, uint id)public view returns(uint, address,bytes, bytes, bytes, bytes){
+	require(isValid(ip,id));
+	return(certificates[ip][id].date,certificates[ip][id].o_addr,certificates[ip][id].publicKeyRir,certificates[ip][id].info.hashFunction,certificates[ip][id].info.hash,certificates[ip][id].Roa);
+}
+
+function getCertificateValidityTime(bytes4 ip, uint id) public view returns (uint){
+	require(isValid(ip,id));
+	return(certificates[ip][id].validityT);
+}
+
+function getCertificatesURI(bytes4 ip, uint id)public view returns(bytes){
+	require(isValid(ip,id));
+	return(certificates[ip][id].info.uri);
 }
 
 
 
-function updateCertificateROA_Info(bytes4 ip, uint id, bytes roa_, bytes uri_, bytes hash_, bytes hashFunction_)public {
-
+function updateCertificateROA(bytes4 ip, uint id, bytes roa_)public {
+	require(isValid(ip,id));
 	require(msg.sender==certificates[ip][id].o_addr);
 	certificates[ip][id].Roa=roa_;
+}
+
+
+function updateCertificateRpk(bytes4 ip, uint id, bytes rpk_)public {
+	require(isValid(ip,id));
+	require(msg.sender==certificates[ip][id].o_addr);
+	certificates[ip][id].publicKeyRir=rpk_;
+}
+
+
+function updateCertificateURI(bytes4 ip, uint id, bytes uri_)public {
+	require(isValid(ip,id));
+	require(msg.sender==certificates[ip][id].o_addr);
 	certificates[ip][id].info.uri=uri_;
-	certificates[ip][id].info.hashFunction=hashFunction_;
-	certificates[ip][id].info.hash=hash_;
 }
 
 
@@ -154,8 +193,12 @@ function updateCertificateROA_Info(bytes4 ip, uint id, bytes roa_, bytes uri_, b
 function iterateInsert(uint iteration)public{
 
 for(uint i =0; i<iteration;i++){
-insertCertificate(0xc0000100,"www.fabiolaIsTheMostBeautifulGirlInTheWorld.com","sha256","aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","10082017");
+insertCertificate(0xc0000100,"blabla","www.fabiolaIsTheMostBeautifulGirlInTheWorld.com","sha256","aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","10082017");
 }
 }
 
+
+
+//MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzh/1Ws2aiqyxR0tqpkAC tLGhQMrkYfcxYl7BzxFaSEitdsNhxqNZjAt+IB/yQ9XEKaHL87cqmZlrtEGju0Dk QKym0onn3JXtS7S1OTRQbjWPN0k9/1HnP/R5xnQvGfaMOPm9S5If6DPr63109inX 5JXv4yNx/x8GZAT+RrhRW/I+PzmXVeSwc89LbADblpQR5x9x6173ncHUV+6UJr2M niBl7OcFW61jbGhTQSrb9xoUli7IyAciziESE6cG2gqw0fW/ZOo7pUToPaDAPxHJ vLq0uqtlpG5z3MpAoVibtdtuF9BF2dKHFF6TMwUKJaQ5EQZ+/iODk6CuWz6Q5iZN  
+// GwIDAQAB
 }//END 
