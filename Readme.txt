@@ -46,8 +46,12 @@ To Read Certificates IDs	// NB. start-stop <5000  due to gas limit reason
 4.3: Run x.readCertificateIDs(bytes4 ip, uint start, uint stop)
 
 Once we get the ID of a certificate
+
+To get Certificate Info
 4.4 Run: x.getCertificates(ip,id)
 
+To get Certificate Associated Keys and the userSignedMessage
+4.5 Run: x.getCertificatesKeys(ip,id)
 
 To Modify a certificate info: 
-4.5 Run: updateCertificateROA_Info(ip,id,ROAs,uris,hash, hashFunction)
+4.6 Run: updateCertificateROA_Info(ip,id,ROAs,uris,hash, hashFunction)

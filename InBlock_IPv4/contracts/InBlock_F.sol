@@ -5,7 +5,7 @@ import "./InBlock_Data.sol";
 contract InBlock_F is InBlock_Data{
 
 
-function insertCertificate(bytes4 ip, bytes key, bytes uri_, bytes hashFunction_, bytes hash_, bytes ROAs_)payable public{
+function insertCertificate(bytes4 ip, bytes key, bytes key2, bytes sM, bytes uri_, bytes hashFunction_, bytes hash_, bytes ROAs_)payable public{
 
 require((price - 32270100000000000)<=msg.value|| msg.value<=(price + 32270100000000000) , "Price error");
 
@@ -14,6 +14,8 @@ Certificate memory currentCertificate;
 currentCertificate.o_addr=msg.sender;
 currentCertificate.id=ID_Index;
 currentCertificate.publicKeyRir=key;
+currentCertificate.publicKeyUser=key2;
+currentCertificate.userSignedMessage=sM;
 currentCertificate.mask=base_certificate_mask;
 currentCertificate.date=now;
 currentCertificate.validityT=now+365* 1 days;
@@ -150,10 +152,17 @@ else return false;
 
 }
 
-function getCertificate(bytes4 ip, uint id)public view returns(uint, address,bytes, bytes, bytes, bytes){
+function getCertificate(bytes4 ip, uint id)public view returns(uint, address, bytes, bytes, bytes){
 	require(isValid(ip,id));
-	return(certificates[ip][id].date,certificates[ip][id].o_addr,certificates[ip][id].publicKeyRir,certificates[ip][id].info.hashFunction,certificates[ip][id].info.hash,certificates[ip][id].Roa);
+	return(certificates[ip][id].date,certificates[ip][id].o_addr,certificates[ip][id].info.hashFunction,certificates[ip][id].info.hash,certificates[ip][id].Roa);
 }
+
+function getCertificateKeys(bytes4 ip, uint id) public view returns(bytes, bytes,bytes){
+	require(isValid(ip,id));
+	return(certificates[ip][id].publicKeyRir, certificates[ip][id].publicKeyUser, certificates[ip][id].userSignedMessage);
+}
+
+
 
 function getCertificateValidityTime(bytes4 ip, uint id) public view returns (uint){
 	require(isValid(ip,id));
@@ -187,18 +196,4 @@ function updateCertificateURI(bytes4 ip, uint id, bytes uri_)public {
 	certificates[ip][id].info.uri=uri_;
 }
 
-
-//testfunction
-
-function iterateInsert(uint iteration)public{
-
-for(uint i =0; i<iteration;i++){
-insertCertificate(0xc0000100,"blabla","www.fabiolaIsTheMostBeautifulGirlInTheWorld.com","sha256","aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","10082017");
-}
-}
-
-
-
-//MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzh/1Ws2aiqyxR0tqpkAC tLGhQMrkYfcxYl7BzxFaSEitdsNhxqNZjAt+IB/yQ9XEKaHL87cqmZlrtEGju0Dk QKym0onn3JXtS7S1OTRQbjWPN0k9/1HnP/R5xnQvGfaMOPm9S5If6DPr63109inX 5JXv4yNx/x8GZAT+RrhRW/I+PzmXVeSwc89LbADblpQR5x9x6173ncHUV+6UJr2M niBl7OcFW61jbGhTQSrb9xoUli7IyAciziESE6cG2gqw0fW/ZOo7pUToPaDAPxHJ vLq0uqtlpG5z3MpAoVibtdtuF9BF2dKHFF6TMwUKJaQ5EQZ+/iODk6CuWz6Q5iZN  
-// GwIDAQAB
 }//END 

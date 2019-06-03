@@ -75,6 +75,8 @@ struct Certificate{
 	address o_addr;
 	uint id;
 	bytes publicKeyRir;
+	bytes publicKeyUser;
+	bytes userSignedMessage;
 	uint8 mask;
 	uint date;
 	uint validityT;
