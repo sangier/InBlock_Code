@@ -12,7 +12,8 @@ contract InBlock is InBlock_F, usingOraclize{
 
 constructor() public{
 	owner=msg.sender;  
-	stopped=true; 
+	stopped=true;
+	active=false;
 	askOracleCost=12000000000000000;
 	OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475); //Testrpc
 	//OAR = OraclizeAddrResolverI(0xc03A2615D5efaf5F49F60B7BB6583eaec212fdf1); //Ropsten
@@ -22,11 +23,15 @@ constructor() public{
 
 
 //To Set the Initial Block  
- function activateInBlock(uint8 _base_certificate_mask, uint price) onlyOwner() public {
+ function activateInBlock(uint8 _base_certificate_mask, uint8 _delegation_mask, uint price) onlyOwner() public {
+	
+	require(_base_certificate_mask<_delegation_mask);
+	
 	base_certificate_mask=_base_certificate_mask;
-	ID_Index=0;
+	delegation_mask=_delegation_mask;
 	dollarsPrice=price;
 	stopped=false;
+	active=true;
 }
 	
 //******************************************************* ORACLE FUNCTIONS *******************************************************
@@ -79,13 +84,17 @@ function transferInBlockControl(address new_owner)onlyOwner(){
 	}
 
 //Function to permit the transfer of the ownership of a specific block 
-function transferCertificateControl(bytes4 ip,uint id, address new_owner) public {
-		
+function transferRegisteredPrefixControl(bytes4 ip,uint id, address new_owner) public {
 		
 		require(msg.sender==certificates[ip][id].o_addr, "You are not the owner of the block");
 		certificates[ip][id].o_addr=new_owner;
 
 }
+
+
+
+
+
 
 
 //******************************************************* CONTRACT BALANCE FUNCTIONS *******************************************************

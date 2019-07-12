@@ -16,6 +16,12 @@ modifier notStopped(){
 	_;
 }
 
+modifier notActive(){
+	require(active==false);
+	_;
+}
+
+
 function toggleCircuit() onlyOwner() public{
 	stopped=!stopped;
 }
@@ -33,51 +39,70 @@ seed=a;
 }*/
 
 
+modifier onlyCertOwner(bytes4 ip, uint id){
+
+require(msg.sender==certificates[ip][id].o_addr);
+_;
+}
+
+
+modifier onlyDelOwner(bytes4 ip, uint id){
+require(msg.sender==certificates[ip][id].del.oD_addr);
+_;
+
+}
+
+
 //******************************************************* DATA STRUCTURE DEFINITION *******************************************************
 
 uint public certificatePrice1;
 uint public certificatePrice2;
 uint public certificatePrice3;
 uint public askOracleCost;
+//To store the price expressed in Wei (it is the common form). NB:  1 ether = 1000000000000000000 wei  
 uint public price; 
 uint public dollarsPrice;
-int public ID;
-uint public ID_Index;
-int public ID_expired;
 uint IDsReadLimit=5000;
-uint IDsReadByOwnerLimit=2500;
-uint OwnersReadLimit=2500;
 
-//To store the price expressed in Wei (it is the common form). NB:  1 ether = 1000000000000000000 wei  
-uint public prefixPrice;
+bytes public ArinPublicKey;
+bytes public RipePublicKey;
+bytes public LacnicPublicKey;
+bytes public AfrinicPublicKey;
+bytes public ApnicPublicKey;
 
-//To store the initial_block
-bytes4 public initial_block;
+
 uint8 public base_certificate_mask;
-	
+uint8 public delegation_mask;
 	
 //The owner address 
 address public owner;
 
 //For Start and Stop paradigm	
 bool public stopped; 	
+bool public active;
 
+
+struct delegation{
+
+bytes uri;
+bytes Roa;
+address oD_addr;
+
+}
 
 struct Info{
 	bytes uri; 
 	bytes hashFunction;
-	bytes hash;
+	bytes SignedHash;
 }
 
 
 struct Certificate{
 	bytes4 ip_address;
 	address o_addr;
+    delegation del;
+	bytes UriToRpki;
 	uint id;
-	bytes publicKeyRir;
-	bytes publicKeyUser;
-	bytes userSignedMessage;
-	uint8 mask;
 	uint date;
 	uint validityT;
 	Info info;
