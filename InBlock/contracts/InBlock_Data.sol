@@ -40,7 +40,9 @@ seed=a;
 uint public prefixPrice1;
 uint public prefixPrice2;
 uint public prefixPrice3;
-uint public askOracleCost;
+uint public oraclesValidity;
+uint public securityPrice;
+//uint public askOracleCost;
 uint public price; 
 uint public dollarsPrice;
 int public ID;
@@ -48,7 +50,14 @@ int public ID_Index;
 int public ID_expired;
 
 //To store the price expressed in Wei (it is the common form). NB:  1 ether = 1000000000000000000 wei  
-uint public prefixPrice;
+
+struct userPrefixPrice{
+uint prefixPrice;
+uint validity;
+}
+
+
+mapping(address=>userPrefixPrice) userPrefixPrices;
 
 //To store the initial_block
 bytes16 public initial_block;
@@ -194,7 +203,7 @@ function sparse(uint id) public view returns(bytes16){
 		}else return false; 
 	}
 
-	function isPrefixInUseIP(bytes16 ip) view public returns(bool){
+	/*function isPrefixInUseIP(bytes16 ip) view public returns(bool){
 	int id=int(reverseSparse(ip));
 		if(!isAllocatedPrefixExpired(id)){
 			return true;
@@ -203,7 +212,7 @@ function sparse(uint id) public view returns(bytes16){
 			return false; 
 			}
 		return true;
-	}
+	}*/
 	
 	function isPrefixInUse(int id) view public returns(bool){
 		if(!isAllocatedPrefixExpired(id)){
@@ -215,13 +224,13 @@ function sparse(uint id) public view returns(bytes16){
 		return true;
 	}
 
-  function expire_id(int id) public returns (bool){
+  /*function expire_id(int id) public returns (bool){
 	
 	if(blocks[id].date!=0 ){
 	    blocks[id].date=blocks[id].date - 365* 1 days;
 		return true;
 		}else return false; 
-	}
+	}*/
 
 
 }// END OF THE CONTRACT

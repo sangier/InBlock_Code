@@ -20,12 +20,13 @@ function getItem(int id) public view returns (bytes16 ip, address o, uint8 mask,
 
 }
 
+/*
 function getAddressID(int id) public view returns (bytes16 ip){
 		
 		ip = blocks[id].ip_address;
         return(ip);
 
-}
+}*/
 
 	
 function countBlockAddress(address a, int start, int stop)view internal returns(uint){
@@ -55,15 +56,19 @@ function getIDsBlocksAddress(address a,int start, int stop)view public returns(u
 
 }
 
-
+function getPrefixCost()public view returns(uint){
+	require(now<=userPrefixPrices[msg.sender].validity, "Price Expired, please request again the prefix price");
+	return(userPrefixPrices[msg.sender].prefixPrice);
+}
 
 //******************************************************* FIXED SIZE BLOCK REQUEST FUNCTIONS *******************************************************
 
 
 //PrefixRequest With sparse allocation for /32	 NB there is a fixed limit of /32 available blocks.
-function prefixRequest() payable public returns(bool){
+function prefixRequest() notStopped() payable public returns(bool){
 		
-	require((prefixPrice - 32270100000000000)<=msg.value|| msg.value<=(prefixPrice + 32270100000000000) , "Price error");
+	require(now<=userPrefixPrices[msg.sender].validity, "Price Expired, please request again the prefix price");
+	require(userPrefixPrices[msg.sender].prefixPrice==msg.value , "Price error");
 	
 	bool ok=false;
 	while(!ok){
@@ -102,8 +107,10 @@ function prefixRequest() payable public returns(bool){
 function sequentialAllocationPrefixRequest(bytes16 ip) notStopped() payable public returns (bool){
 	
 	require(ID_Index<int(max_allocable_blocks));
-	require((prefixPrice - 32270100000000000)<=msg.value || msg.value<=(prefixPrice + 32270100000000000) , "Price error");
-	int id= int(reverseSparse(ip));
+	//require((prefixPrice - 32270100000000000)<=msg.value || msg.value<=(prefixPrice + 32270100000000000) , "Price error");
+	require(now<=userPrefixPrices[msg.sender].validity, "Price Expired, please request again the prefix price");
+	require(userPrefixPrices[msg.sender].prefixPrice==msg.value , "Price error");
+    int id= int(reverseSparse(ip));
 	require(isPrefixInUse(id));
 	require(msg.sender==blocks[id].o_addr, "You are not Authorized");
 		
@@ -140,8 +147,9 @@ function sequentialAllocationPrefixRequest(bytes16 ip) notStopped() payable publ
 /*
 function prefixRenew(bytes16 ip) notStopped() payable public returns (bool,uint){
 	
-	require(msg.value==prefixPrice, "Price Error.");
-	
+	//require(msg.value==prefixPrice, "Price Error.");
+	require(now<=userPrefixPrices[msg.sender].validity, "Price Expired, please request again the prefix price");
+	require(userPrefixPrices[msg.sender].prefixPrice==msg.value , "Price error");
 	int id=int(reverseSparse(ip));
 	require(isPrefixInUse(id));
 	require(msg.sender==blocks[id].o_addr, "You are not the owner of the block");
@@ -151,9 +159,12 @@ function prefixRenew(bytes16 ip) notStopped() payable public returns (bool,uint)
 	return(true,blocks[id].date);
 }*/
 
+
 function prefixRenewID(int id) notStopped() payable public returns (bool,uint){
 	
-	require(msg.value==prefixPrice, "Price Error.");
+	//require(msg.value==prefixPrice, "Price Error.");
+    require(now<=userPrefixPrices[msg.sender].validity, "Price Expired, please request again the prefix price");
+	require(userPrefixPrices[msg.sender].prefixPrice==msg.value , "Price error");
 	require(isPrefixInUse(id));
 	require(msg.sender==blocks[id].o_addr, "You are not the owner of the block");
 	uint app1= (blocks[id].date+365* 1 days)-now;
@@ -161,6 +172,7 @@ function prefixRenewID(int id) notStopped() payable public returns (bool,uint){
 	owner.transfer(msg.value);
 	return(true,blocks[id].date);
 }
+
 
 //******************************************************* BLOCK RECOVER FUNCTION *******************************************************
 
@@ -233,7 +245,7 @@ function delete_expired()internal{
 }
 
 //******************************************************* POLICY FUNCTIONS *******************************************************
-function setPolicyURI(bytes16 ip, bytes uri, bytes hashFunction, bytes hash) public {
+/*function setPolicyURI(bytes16 ip, bytes uri, bytes hashFunction, bytes hash) public {
 	
 	int id=int(reverseSparse(ip));
 	require(isPrefixInUse(id));
@@ -241,7 +253,7 @@ function setPolicyURI(bytes16 ip, bytes uri, bytes hashFunction, bytes hash) pub
 	blocks[id].info.hashFunction=hashFunction;
 	blocks[id].info.hash=hash;
 			
-}
+}*/
 
 function setPolicyURIiD(int id, bytes uri, bytes hashFunction, bytes hash) public {
 	
@@ -272,14 +284,14 @@ function getRoA(bytes16 ip)view public returns(bytes){
 	return blocks[id].Roa;
 }
 
-
+/*
 function setRoA(bytes16 ip, bytes ASes) public {
 					
 	int id=int(reverseSparse(ip));
 	require(isPrefixInUse(id));
 	require(msg.sender==blocks[id].o_addr);
 	blocks[id].Roa=ASes;
-}
+}*/
 
 
 function setRoAID(int id, bytes ASes) public {

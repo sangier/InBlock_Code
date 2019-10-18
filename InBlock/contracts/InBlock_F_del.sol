@@ -6,6 +6,8 @@ contract InBlock_F_del is InBlock_Data{
 
 //******************************************************* DELEGATION FUNCTIONS *******************************************************
 
+
+
  
 //To perform a delegation. NB the sender of the transaction has to be the owner of the parent_ip 
 function delegatePrefix(bytes16 _parent_ip, bytes16 del_ip, uint8 bar, address delegated_address) notStopped() public {
@@ -327,6 +329,8 @@ function getDelegatedPrefixPolicyURI(bytes16 ip_parent, bytes16 ip, uint8 mask)v
 	
 
 }
+
+
 
 }//END
 
