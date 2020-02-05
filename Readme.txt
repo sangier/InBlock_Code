@@ -5,11 +5,23 @@ InBlock IPv6
 To properly run the software:
 
 In a cmd:
-1.1:  Run a testrpc  (local private testnet)
+1.1: (local private testnet)  Run :ganache-cli -l 2000000000000000000  --allowUnlimitedContractSize --db C:\Users\User\Desktop\GanacheDir\Blocks --account_keys_path C:\Users\User\Desktop\GanacheDir\Accounts\Accounts.txt --defaultBalanceEther 900000000000000000000  -i 100 
+      ganache-cli -l 2000000000000000000  --allowUnlimitedContractSize --db C:\Users\User\Desktop\GanacheDir\Blocks --account_keys_path C:\Users\User\Desktop\GanacheDir\Accounts\Accounts.json --defaultBalanceEther 900000000000000000000 --mnemonic "surprise shine chalk surprise theory stem wrestle step soup attitude trend valid" -i 100
+
+
+For Linux:
+First Instance: ganache-cli -l 2000000000000000000  --allowUnlimitedContractSize --db /home/sangieri/GanacheDir/Blocks --account_keys_path /home/sangieri/GanacheDir/Accounts/Accounts.txt --defaultBalanceEther 900000000000000000000 -i 120
+Resume: ganache-cli -l 2000000000000000000  --allowUnlimitedContractSize --db /home/sangieri/GanacheDir/Blocks --account_keys_path /home/sangieri/GanacheDir/Accounts/Accounts.txt --defaultBalanceEther 900000000000000000000 -i 120 --mnemonic "process lend faint height crumble rotate humble mesh tape spike pluck pride"
 
 In another cmd:
 1.2:  Move into "Bridge\ethereum-bridge-master" folder 
-1.3:  Run: node bridge -H localhost:8545 -a 1
+1.3:  Run: ethereum-bridge -H localhost:8545 -a 1
+
+In InBlock.sol 
+Decomment the right OAR line according to the used network 
+      OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475); //Testrpc
+	//OAR = OraclizeAddrResolverI(0xc03A2615D5efaf5F49F60B7BB6583eaec212fdf1); //Ropsten
+	//OAR = OraclizeAddrResolverI(0x1d3B2638a7cC9f2CB3D298A3DA7a90B67E5506ed);	//mainnnet 
 
 In another cmd: 
 1.4:  Move into  "InBlock\contracts" folder 
@@ -28,8 +40,8 @@ To initialize the contract Run:
 To perform and verify a sparse_allocation: 
 3.1:  Run: x.askOracleCost() //then copy the result
 3.2:  Run: x.getOracleCurrencyConversion({value: the copied value})
-3.3:  Run: x.getPrefixCost() 
-3.4:  Run: x.prefix //then copy the result 
+3.3:  Run: x.computePrefixCost() 
+3.4:  Run: x.getPrefixCost() //then copy the result 
 
 3.5:  Run: x.prefixRequest({from: wirte the address who will own the prefix, value: paste the result previously copied})
 3.6:  Run: x.getIDsBlocks_address(address a,int start, int stop)  //It give us the IDs of the blocks owned by the user having the specific address // NB. New start and stop paradigm to overcome computational limitation. Instead of asking for a search on the whole database we have to split the search in chunks. 
@@ -41,8 +53,8 @@ To perform and verify a sparse_allocation:
 To perform and verify a sequent_allocation:
 4.1:  Run: x.askOracleCost() //then copy the result
 4.2:  Run: x.getOracleCurrencyConversion({value: the copied value})
-4.3:  Run: x.getPrefixCost() 
-4.4:  Run: x.prefix() //then copy the result 
+4.3:  Run: x.computePrefixCost() 
+4.4:  Run: x.getPrefiCost() //then copy the result 
 
 4.5:  Run: x.sequentialAllocationPrefixRequest("ip_address of already owned prefix",{from: wirte the address who will own the prefix, value: paste the result previously copied})  
 4.6:  Run: x.getIDsBlocks_address(address a,int start, int stop)  //NB. New start and stop paradigm to overcome computational limitation. Instead of asking for a search on the whole database we have to split the search in chunks. 
@@ -84,3 +96,29 @@ For a del_Block
 7.5: Run: x.getDelegatedPrefixPolicyURI(bytes16 ip_parent, bytes16 ip, uint8 mask)
 7.6: Run: x.setDelegatedPrefixRoA(bytes16 ip_parent, bytes16 ip, uint8 mask, bytes ASes)
 7.7: Run: x.getDelegatedPrefixRoA(bytes16 ip_parent, bytes16 ip, uint8 mask)
+
+
+
+
+
+
+
+Hola, 
+
+Os escribo un pseudo codigo de lo que tiene que hacer una tercera parte para construir su tabla de ROAs a travers de InBlock. 
+
+CALL: getIDsAssignedBlocks(int start, int stop)     (Devuelve un listado de IDs de los prefixos validos,  con stop - start<=500)
+ For Each ID:
+CALL :getItem(int ID)     (Devuelve todo el objecto prefixo con Roa y info sobre la roa)
+CALL: getIDsDelBlocks(int ID) returns(uint[]result)  (Devuelve un listado de IDs del los prefixos delegados, validos)
+For Each delegated ID
+getDelBlockID_Roa(ID,delegatedID)  (Devuelve todo el objecto prefixo_delegado con Roa y info sobre la roa)
+
+Todas las interacciones con el contrato son CALL asì que no hay costes a pagar por la computacion. 
+
+Quedan por hacer: 
+Nueva analysis de los costes de las funciones de delegaciones.  
+Nueva analysis de los tiempos de inclusion el blockchain de las funciones de delegaciones.   Hace falta hacerla? Los resultados van a ser muy parecidos a los de las otras funciones. 
+Analysis de tiempo de construcción de la tabla de Roa.
+Analysis de tiempo de construcción de la tabla de Roa al variar de la longitud del prefixo base.  
+Saludos 

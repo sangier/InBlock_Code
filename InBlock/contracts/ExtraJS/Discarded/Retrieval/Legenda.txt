@@ -1,0 +1,11 @@
+Init.js Insert base prefix plus 4096 prefix /32 
+InitRoa.js Insert Roa for 4096 prefix /32 
+
+Combined.js Takes /32 prefix IDs and get roa from those prefix 
+
+InitDel.js    Insert Roa for every delegated prefix
+InitDelRoa.js Delegates one /48 prefix for every 4096 /32 
+
+delID.js get all delegated ids. 
+
+delRoaT.js creates the roa table from delegated addresses
