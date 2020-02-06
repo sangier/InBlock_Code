@@ -9,7 +9,7 @@ contract InBlock_Data is Utility{
 
 //FOR START AND STOP PARADIGM
 
-function circuitBreaker() onlyOwner() public{
+function prefixAllocationStop() onlyOwner() public{
 	stopped=false;
 } 
 
@@ -18,7 +18,7 @@ modifier notStopped(){
 	_;
 }
 
-function toggleCircuit() onlyOwner() public{
+function prefixAllocationResume() onlyOwner() public{
 	stopped=!stopped;
 }
 
@@ -80,7 +80,10 @@ struct index{
 int ind;
 }
 
-	
+struct dIndex{
+int counter;
+mapping(int=>int) del_ID_List;
+}
 
 struct Info{
 	bytes uri; 
@@ -96,7 +99,8 @@ struct Block{
 	Info info;
 	bytes Roa;
 	mapping(int=>del_Block) del_blocks;
-	mapping(int=>index) del_array_index;
+	mapping(int=>index) del_array_index; 
+	dIndex dindex;
 	int del_ID_Index;
 	int ID_delegated;
 }

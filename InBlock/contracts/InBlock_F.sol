@@ -56,16 +56,46 @@ function getIDsBlocksAddress(address a,int start, int stop)view public returns(u
 
 }
 
-function getPrefixCost()public view returns(uint){
+
+
+function countAssignedBlock(int start, int stop)view internal returns(uint){
+uint count=0;
+for(int i=start; i<stop+1; i++){
+		if(blocks[i].o_addr!=0x00 && !isAllocatedPrefixExpired(i)){
+		count=count+1;
+		}
+		}
+	return count;
+}
+
+function getIDsAssignedBlocks(int start, int stop)view public returns(uint[]result){
+
+	uint count=countAssignedBlock(start,stop);
+	result = new uint[] (count);
+	uint counter=0;
+	
+	for(int i=start;i<stop+1;i++){
+		if(blocks[i].o_addr!=0x00 && !isAllocatedPrefixExpired(i)){
+		result[counter]=uint(i);
+		counter=counter+1;
+		}
+	}
+	return result; 
+}
+
+function getAllocationCost()public view returns(uint){
 	require(now<=userPrefixPrices[msg.sender].validity, "Price Expired, please request again the prefix price");
 	return(userPrefixPrices[msg.sender].prefixPrice);
 }
 
 //******************************************************* FIXED SIZE BLOCK REQUEST FUNCTIONS *******************************************************
 
+//Declare an Event
+//event prefixRequestEvent(address indexed _from, uint _value);
+
 
 //PrefixRequest With sparse allocation for /32	 NB there is a fixed limit of /32 available blocks.
-function prefixRequest() notStopped() payable public returns(bool){
+function getAllocation() notStopped() payable public returns(bool){
 		
 	require(now<=userPrefixPrices[msg.sender].validity, "Price Expired, please request again the prefix price");
 	require(userPrefixPrices[msg.sender].prefixPrice==msg.value , "Price error");
@@ -80,6 +110,8 @@ function prefixRequest() notStopped() payable public returns(bool){
 			setBlockExpired(app2);
 			delete_expired();
 			ok=true;
+			//Emit an event
+	//		emit prefixRequestEvent(msg.sender,msg.value);
 			return ok;
 		}else{
 			
@@ -90,6 +122,8 @@ function prefixRequest() notStopped() payable public returns(bool){
 				seed=seed+1;
 				owner.transfer(msg.value);
 				ok=true;
+                //Emit an event
+		//		emit prefixRequestEvent(msg.sender,msg.value);
 				return ok;
 			}
 			else {
@@ -104,10 +138,9 @@ function prefixRequest() notStopped() payable public returns(bool){
 
  
 //function to perform a sequent allocation if an user already has a block and want the contiguos one 
-function sequentialAllocationPrefixRequest(bytes16 ip) notStopped() payable public returns (bool){
+function getSequentialAllocation(bytes16 ip) notStopped() payable public returns (bool){
 	
 	require(ID_Index<int(max_allocable_blocks));
-	//require((prefixPrice - 32270100000000000)<=msg.value || msg.value<=(prefixPrice + 32270100000000000) , "Price error");
 	require(now<=userPrefixPrices[msg.sender].validity, "Price Expired, please request again the prefix price");
 	require(userPrefixPrices[msg.sender].prefixPrice==msg.value , "Price error");
     int id= int(reverseSparse(ip));
@@ -145,7 +178,7 @@ function sequentialAllocationPrefixRequest(bytes16 ip) notStopped() payable publ
 //******************************************************* BLOCK RENEWAL FUNCTION *******************************************************
 
 /*
-function prefixRenew(bytes16 ip) notStopped() payable public returns (bool,uint){
+function renewAllocation(bytes16 ip) notStopped() payable public returns (bool,uint){
 	
 	//require(msg.value==prefixPrice, "Price Error.");
 	require(now<=userPrefixPrices[msg.sender].validity, "Price Expired, please request again the prefix price");
@@ -160,7 +193,7 @@ function prefixRenew(bytes16 ip) notStopped() payable public returns (bool,uint)
 }*/
 
 
-function prefixRenewID(int id) notStopped() payable public returns (bool,uint){
+function renewAllocationID(int id) notStopped() payable public returns (bool,uint){
 	
 	//require(msg.value==prefixPrice, "Price Error.");
     require(now<=userPrefixPrices[msg.sender].validity, "Price Expired, please request again the prefix price");
@@ -204,7 +237,7 @@ function getIDsPrefixExpired(int start, int stop)view public returns(uint[]resul
 }
 
 
-function recoverExpiredBlock(int id)onlyOwner()public {
+function recoverExpiredAllocation(int id)onlyOwner()public {
 
 	require(isAllocatedPrefixExpired(id));
 	blocks[id].ip_address="";
@@ -277,7 +310,7 @@ function getPolicyURI(bytes16 ip) public returns(bytes, bytes, bytes ) {
 
 //******************************************************* ASes FUNCTIONS *******************************************************
 
-function getRoA(bytes16 ip)view public returns(bytes){
+function getRoa(bytes16 ip)view public returns(bytes){
 	
 	int id=int(reverseSparse(ip));
 	require(isPrefixInUse(id));
@@ -285,7 +318,7 @@ function getRoA(bytes16 ip)view public returns(bytes){
 }
 
 /*
-function setRoA(bytes16 ip, bytes ASes) public {
+function setRoa(bytes16 ip, bytes ASes) public {
 					
 	int id=int(reverseSparse(ip));
 	require(isPrefixInUse(id));
@@ -294,12 +327,22 @@ function setRoA(bytes16 ip, bytes ASes) public {
 }*/
 
 
-function setRoAID(int id, bytes ASes) public {
+event setRoaEvent(address indexed _from, uint _value, int id);
+
+function setRoaID(int id, bytes ASes) public returns(int ){
 
 	require(isPrefixInUse(id));
 	require(msg.sender==blocks[id].o_addr);
 	blocks[id].Roa=ASes;
+    emit setRoaEvent(msg.sender, msg.value, id);
+    return id;
 }
+
+function getRoa(int id)view public returns(bytes16,bytes,uint8){
+	require(isPrefixInUse(id));
+	return (blocks[id].ip_address,blocks[id].Roa,blocks[id].mask);
+}
+
 
 //*****************************************************BLOCKS SETTER*************************************************************
 	

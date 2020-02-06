@@ -1,15 +1,27 @@
 *********************************** Stefano Angieri @ Universidad Carlos III Madrid ***********************************
+InBlock IPv6. 
 
-InBlock IPv6
 
 To properly run the software:
 
 In a cmd:
-1.1:  Run a testrpc  (local private testnet)
+1.1: (local private testnet)  Run :ganache-cli -l 2000000000000000000  --allowUnlimitedContractSize --db C:\Users\User\Desktop\GanacheDir\Blocks --account_keys_path C:\Users\User\Desktop\GanacheDir\Accounts\Accounts.txt --defaultBalanceEther 900000000000000000000  -i 100 
+      ganache-cli -l 2000000000000000000  --allowUnlimitedContractSize --db C:\Users\User\Desktop\GanacheDir\Blocks --account_keys_path C:\Users\User\Desktop\GanacheDir\Accounts\Accounts.json --defaultBalanceEther 900000000000000000000 --mnemonic "surprise shine chalk surprise theory stem wrestle step soup attitude trend valid" -i 100
+
+
+For Linux:
+First Instance: ganache-cli -l 2000000000000000000  --allowUnlimitedContractSize --db /home/sangieri/GanacheDir/Blocks --account_keys_path /home/sangieri/GanacheDir/Accounts/Accounts.txt --defaultBalanceEther 900000000000000000000 -i 120
+Resume: ganache-cli -l 2000000000000000000  --allowUnlimitedContractSize --db /home/sangieri/GanacheDir/Blocks --account_keys_path /home/sangieri/GanacheDir/Accounts/Accounts.txt --defaultBalanceEther 900000000000000000000 -i 120 --mnemonic "process lend faint height crumble rotate humble mesh tape spike pluck pride"
 
 In another cmd:
 1.2:  Move into "Bridge\ethereum-bridge-master" folder 
-1.3:  Run: node bridge -H localhost:8545 -a 1
+1.3:  Run: ethereum-bridge -H localhost:8545 -a 1
+
+In InBlock.sol 
+Decomment the right OAR line according to the used network 
+      OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475); //Testrpc
+	//OAR = OraclizeAddrResolverI(0xc03A2615D5efaf5F49F60B7BB6583eaec212fdf1); //Ropsten
+	//OAR = OraclizeAddrResolverI(0x1d3B2638a7cC9f2CB3D298A3DA7a90B67E5506ed);	//mainnnet 
 
 In another cmd: 
 1.4:  Move into  "InBlock\contracts" folder 
@@ -28,10 +40,10 @@ To initialize the contract Run:
 To perform and verify a sparse_allocation: 
 3.1:  Run: x.askOracleCost() //then copy the result
 3.2:  Run: x.getOracleCurrencyConversion({value: the copied value})
-3.3:  Run: x.getPrefixCost() 
-3.4:  Run: x.prefix //then copy the result 
+3.3:  Run: x.computeAllocationCost() 
+3.4:  Run: x.getAllocationCost() //then copy the result 
 
-3.5:  Run: x.prefixRequest({from: wirte the address who will own the prefix, value: paste the result previously copied})
+3.5:  Run: x.getAllocation({from: wirte the address who will own the prefix, value: paste the result previously copied})
 3.6:  Run: x.getIDsBlocks_address(address a,int start, int stop)  //It give us the IDs of the blocks owned by the user having the specific address // NB. New start and stop paradigm to overcome computational limitation. Instead of asking for a search on the whole database we have to split the search in chunks. 
 3.7:  Run: x.getItem(id discovered before);//we can access to those block with the given IDs discovered before
 
@@ -41,10 +53,10 @@ To perform and verify a sparse_allocation:
 To perform and verify a sequent_allocation:
 4.1:  Run: x.askOracleCost() //then copy the result
 4.2:  Run: x.getOracleCurrencyConversion({value: the copied value})
-4.3:  Run: x.getPrefixCost() 
-4.4:  Run: x.prefix() //then copy the result 
+4.3:  Run: x.computeAllocationCost() 
+4.4:  Run: x.getAllocationCost() //then copy the result 
 
-4.5:  Run: x.sequentialAllocationPrefixRequest("ip_address of already owned prefix",{from: wirte the address who will own the prefix, value: paste the result previously copied})  
+4.5:  Run: x.getSequentialAllocation("ip_address of already owned prefix",{from: wirte the address who will own the prefix, value: paste the result previously copied})  
 4.6:  Run: x.getIDsBlocks_address(address a,int start, int stop)  //NB. New start and stop paradigm to overcome computational limitation. Instead of asking for a search on the whole database we have to split the search in chunks. 
 4.7:  Run: x.getItem(id discovered before); //we can access to those block with the given IDs discovered before 
 
@@ -54,7 +66,7 @@ Delgation:
 
 Precodition. At least one Block has to be requested. 
 
-5.1 Run: delegate_block(parent_ip, del_ip, mask, delegated_address)
+5.1 Run: delegatePrefix(parent_ip, del_ip, mask, delegated_address)
 5.2.1 Run: x.del_find(parent_ip, del_ip, mask)
 5.2.2 Run: x.getIDs_del_Blocks(parent_ip, int start, int stop) // To get all the valid del_block ID delegated from the parent Block 
 5.3.1 Run: x.get_del_Block_id(int id, int id2) // NB you can find id simply typing x.reverseSparse(parent_ip)
@@ -67,7 +79,7 @@ To revoke delegation:
 Expired Block Recovery:
 
 6.1: Run: x.getIDsBlocks_expired(start, stop)
-6.2: Run: x.recoverExpiredBlock(id) // this operation has to be done block for block using the ID. 
+6.2: Run: x.recoverExpiredAllocation(id) // this operation has to be done block for block using the ID. 
 6.3: Run: x.getRecovered() 
 
 
@@ -76,11 +88,12 @@ INFO and ROA functions:
 For a Block
 7.1: Run: x.setPolicyURI(bytes16 ip, bytes uri, bytes hashFunction, bytes hash) // example : x.setInfoBlock("0x2001d000000000000000000000000000", "www.inblock.com","sha252","0xasdw123123jasdag1")
 7.2: Run: x.getItem(id) // Find the Id with x.find(ip,allocation_prefix_mask);
-7.2: Run: x.setRoA(bytes16 ip, bytes ASes)  //example: x.setRoaBlock("0x2001d000000000000000000000000000", "0,13, all ases number separeted by , 10") 
-7.3: Run: x.getRoA(bytes16 ip)
+7.2: Run: x.setRoa(bytes16 ip, bytes ASes)  //example: x.setRoaBlock("0x2001d000000000000000000000000000", "0,13, all ases number separeted by , 10") 
+7.3: Run: x.getRoa(bytes16 ip)
 
 For a del_Block
 7.4: Run: x.setDelegatedPrefixPolicyURI(bytes16 ip_parent, bytes16 ip, uint8 mask, bytes uri, bytes hashFunction, bytes hash)
 7.5: Run: x.getDelegatedPrefixPolicyURI(bytes16 ip_parent, bytes16 ip, uint8 mask)
-7.6: Run: x.setDelegatedPrefixRoA(bytes16 ip_parent, bytes16 ip, uint8 mask, bytes ASes)
-7.7: Run: x.getDelegatedPrefixRoA(bytes16 ip_parent, bytes16 ip, uint8 mask)
+7.6: Run: x.setDelegatedPrefixRoa(bytes16 ip_parent, bytes16 ip, uint8 mask, bytes ASes)
+7.7: Run: x.getDelegatedPrefixRoa(bytes16 ip_parent, bytes16 ip, uint8 mask)
+

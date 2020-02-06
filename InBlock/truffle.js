@@ -21,8 +21,9 @@ module.exports = {
       host: '127.0.0.1',
       port: 8545,
       network_id: '*' ,// Match any network id
-	  gasPrice: 19000000000
-    }
+	  gasPrice: 19000000000,
+	    gas: 790000000
+    }           
   },
 
     solc: {

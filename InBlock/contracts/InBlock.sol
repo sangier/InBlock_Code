@@ -87,7 +87,7 @@ function __callback(bytes32 _myid, string _result) {
 
 
 
-function computePrefixCost()public{
+function computeAllocationCost()public{
 require(now<=oraclesValidity, "Price Not Valid anymore, please make another oracle call");
 bool a;
 bool b;

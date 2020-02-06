@@ -135,6 +135,8 @@ function set_del_Block(bytes16 ip, bytes16 ip2, uint8 mask,address delegated)int
 						if(blocks[id].del_blocks[idCurrent].left==0){
 								idNext=blocks[id].ID_delegated;
 								blocks[id].del_blocks[idCurrent].ip_address=app;
+								//blocks[id].dindex.del_ID_List[blocks[id].dindex.counter]=idCurrent;
+								//	blocks[id].dindex.counter=blocks[id].dindex.counter+1;
 								blocks[id].del_blocks[idCurrent].left=idNext;
 								blocks[id].del_blocks[idNext].parent=idCurrent;
 								blocks[id].ID_delegated=blocks[id].ID_delegated+1;
@@ -148,6 +150,9 @@ function set_del_Block(bytes16 ip, bytes16 ip2, uint8 mask,address delegated)int
 						if(blocks[id].del_blocks[idCurrent].right==0){
 								idNext=blocks[id].ID_delegated;
 								blocks[id].del_blocks[idCurrent].ip_address=app;
+								//									blocks[id].dindex.del_ID_List[blocks[id].dindex.counter]=idCurrent;
+								//	blocks[id].dindex.counter=blocks[id].dindex.counter+1;
+
 								blocks[id].del_blocks[idCurrent].right=idNext;
 								blocks[id].del_blocks[idNext].parent=idCurrent;
 								blocks[id].ID_delegated=blocks[id].ID_delegated+1;
@@ -167,12 +172,16 @@ function set_del_Block(bytes16 ip, bytes16 ip2, uint8 mask,address delegated)int
 					if(blocks[id].del_blocks[idCurrent].left==0){
 							if(blocks[id].del_blocks[idCurrent].right==0){
 									blocks[id].del_blocks[idCurrent].ip_address=app;
+								
 							}
 							idNext=blocks[id].ID_delegated;
 							blocks[id].del_blocks[idCurrent].left=idNext;
 							blocks[id].del_blocks[idNext].parent=idCurrent;
 							blocks[id].ID_delegated=blocks[id].ID_delegated+1;
 							blocks[id].del_blocks[idNext].ip_address=ip2;
+									blocks[id].dindex.del_ID_List[blocks[id].dindex.counter]=idNext;
+									blocks[id].dindex.counter=blocks[id].dindex.counter+1;
+	
 							blocks[id].del_blocks[idNext].o_addr=delegated;
 							blocks[id].del_blocks[idNext].mask=mask;
 							blocks[id].del_array_index[blocks[id].del_ID_Index].ind=idNext;
@@ -181,6 +190,10 @@ function set_del_Block(bytes16 ip, bytes16 ip2, uint8 mask,address delegated)int
 						idNext=blocks[id].del_blocks[idCurrent].left;
 						if(PrefCmpZ(blocks[id].del_blocks[idCurrent].ip_address)){ blocks[id].del_blocks[idCurrent].ip_address=app;}
 						blocks[id].del_blocks[idNext].ip_address=ip2;
+									blocks[id].dindex.del_ID_List[blocks[id].dindex.counter]=idNext;
+									blocks[id].dindex.counter=blocks[id].dindex.counter+1;
+
+								
 						blocks[id].del_blocks[idNext].o_addr=delegated;
 						blocks[id].del_blocks[idNext].mask=mask;
 						blocks[id].del_array_index[blocks[id].del_ID_Index].ind=idNext;
@@ -191,12 +204,18 @@ function set_del_Block(bytes16 ip, bytes16 ip2, uint8 mask,address delegated)int
 							if(blocks[id].del_blocks[idCurrent].right==0){
 									if(blocks[id].del_blocks[idCurrent].left==0){
 									blocks[id].del_blocks[idCurrent].ip_address=app;
+									
+								
 									}
 							idNext=blocks[id].ID_delegated;
 							blocks[id].del_blocks[idCurrent].right=idNext;
 							blocks[id].del_blocks[idNext].parent=idCurrent;
 							blocks[id].ID_delegated=blocks[id].ID_delegated+1;
 							blocks[id].del_blocks[idNext].ip_address=ip2;
+							blocks[id].dindex.del_ID_List[blocks[id].dindex.counter]=idNext;
+							blocks[id].dindex.counter=blocks[id].dindex.counter+1;
+
+								
 							blocks[id].del_blocks[idNext].o_addr=delegated;
 							blocks[id].del_blocks[idNext].mask=mask;
 				
@@ -206,6 +225,8 @@ function set_del_Block(bytes16 ip, bytes16 ip2, uint8 mask,address delegated)int
 									idNext=blocks[id].del_blocks[idCurrent].right;
 									if(PrefCmpZ(blocks[id].del_blocks[idCurrent].ip_address)){ blocks[id].del_blocks[idCurrent].ip_address=app;}
 									blocks[id].del_blocks[idNext].ip_address=ip2;
+									blocks[id].dindex.del_ID_List[blocks[id].dindex.counter]=idNext;
+									blocks[id].dindex.counter=blocks[id].dindex.counter+1;
 									blocks[id].del_blocks[idNext].o_addr=delegated;
 									blocks[id].del_blocks[idNext].mask=mask;
 									blocks[id].del_array_index[blocks[id].del_ID_Index].ind=idNext;
@@ -284,6 +305,60 @@ function getIDsDelBlocks(bytes16 ip, int start, int stop)view public returns(uin
 
 }
 
+
+
+function getIDsDelBlocksID2(int id)view public returns(uint[]result){
+	
+	
+	result = new uint[] (uint(blocks[id].dindex.counter));
+	uint counter=0;
+	
+	for(int i=0;i<blocks[id].dindex.counter;i++){
+			
+				result[counter]=uint(blocks[id].dindex.del_ID_List[i]);
+				counter=counter+1;
+			
+	}
+	return result; 
+
+}
+
+
+
+
+
+
+function count_del_BlockID(int id, int start, int stop)view internal returns(uint){
+	uint count=0;
+	for(int i=start; i<stop+1; i++){
+			int a=blocks[id].del_array_index[i].ind;
+			bytes16 test= blocks[id].del_blocks[a].ip_address;
+			if(blocks[id].del_blocks[a].mask!=0){
+				count=count+1;
+			}
+	}
+	return count;
+
+}
+
+
+function getIDsDelBlocksID(int id, int start, int stop)view public returns(uint[]result){
+	
+	
+	uint count=count_del_BlockID(id,start,stop);
+	result = new uint[] (count);
+	uint counter=0;
+	
+	for(int i=start;i<stop+1;i++){
+			if(blocks[id].del_blocks[blocks[id].del_array_index[i].ind].mask!=0){
+				result[counter]=uint(blocks[id].del_array_index[i].ind);
+				counter=counter+1;
+			}
+	}
+	return result; 
+
+}
+
 //******************************************************************************INFO AND ROA FUNCTIONS ******************************************************************************************************
 function setDelegatedPrefixPolicyURI(bytes16 ip_parent, bytes16 ip, uint8 mask, bytes uri, bytes hashFunction, bytes hash) public {
 			
@@ -297,7 +372,9 @@ function setDelegatedPrefixPolicyURI(bytes16 ip_parent, bytes16 ip, uint8 mask, 
 }
 
 
-function setDelegatedPrefixRoA(bytes16 ip_parent, bytes16 ip, uint8 mask, bytes ASes) public {
+
+
+function setDelegatedPrefixRoa(bytes16 ip_parent, bytes16 ip, uint8 mask, bytes ASes) public {
 			
 			int id= int(reverseSparse(ip_parent));
 			require(isPrefixInUse(id));
@@ -306,9 +383,18 @@ function setDelegatedPrefixRoA(bytes16 ip_parent, bytes16 ip, uint8 mask, bytes 
 			require(msg.sender==blocks[id].del_blocks[id2].o_addr);
 			blocks[id].del_blocks[id2].Roa=ASes;
 			}
+			
+event delegatedPrefixRoaEvent(address indexed _from, uint _value, int id1,int id2);
+function setDelegatedPrefixRoAID(int id1, int id2, bytes ASes) public {
+			
+			require(isPrefixInUse(id1));
+			require(id2!=-1 && id2!=-2);
+			require(msg.sender==blocks[id1].del_blocks[id2].o_addr);
+			blocks[id1].del_blocks[id2].Roa=ASes;
+			emit delegatedPrefixRoaEvent(msg.sender,msg.value,id1,id2);
+			}
 
-
-function getDelegatedPrefixRoA(bytes16 ip_parent, bytes16 ip, uint8 mask)view public returns(bytes){
+function getDelegatedPrefixRoa(bytes16 ip_parent, bytes16 ip, uint8 mask)view public returns(bytes){
 	
 			int id= int(reverseSparse(ip_parent));
 			require(isPrefixInUse(id));
@@ -330,6 +416,14 @@ function getDelegatedPrefixPolicyURI(bytes16 ip_parent, bytes16 ip, uint8 mask)v
 
 }
 
+function getDelegatedPrefixRoaID(int id, int id2)view public returns(bytes16,bytes,uint8){
+	
+			require(isPrefixInUse(id));
+			require(id2!=-1 && id2!=-2);
+			return (blocks[id].del_blocks[id2].ip_address,blocks[id].del_blocks[id2].Roa,blocks[id].del_blocks[id2].mask);
+	
+
+}
 
 
 }//END
